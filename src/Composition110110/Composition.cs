@@ -33,14 +33,14 @@ namespace Composition110110
             var files = Directory.EnumerateFiles(directoryPath, searchPattern).ToList();
             Directory.CreateDirectory(Path.Combine(directoryPath, "out"));
 
-            for (int i = 0; i < 50; i++)
+            for (int i = 0; i < 250; i++)
             {
                 Console.WriteLine($"Composition {i}");
                 var file = files[r.Next(0, files.Count)];
                 var image = Image.Load(file);
                 var composition = new Composition(image);
-                composition.MakeBlackAndWhite(); // TODO: just get nice black and white images
-                composition.Crop(300);
+                //composition.MakeBlackAndWhite(); // TODO: just get nice black and white images
+                composition.Crop(400);
                 composition.PaintMany(6);
                 composition.Save(Path.Combine(directoryPath, "out", $"{i}.png"));
             }
