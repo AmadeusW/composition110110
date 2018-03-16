@@ -10,6 +10,7 @@ namespace Composition110110
     {
         static void Main(string[] args)
         {
+            Composition.ProcessRandomFile(@"C:\Users\ama\Pictures\composition110110\raw\", "*.png");
         }
     }
 }
