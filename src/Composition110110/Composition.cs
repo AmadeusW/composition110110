@@ -13,9 +13,13 @@ namespace Composition110110
 {
     internal class Composition
     {
-        static Random r = new Random();
+        static Random globalRandom = new Random();
+        
         private Image<Rgba32> image;
-        Rgba32[] paintColors = new Rgba32[]
+        private int seed;
+        private Random r;
+
+        static Rgba32[] paintColors = new Rgba32[]
         {
             new Rgba32(200, 0, 0),
             new Rgba32(50, 200, 0),
@@ -23,9 +27,15 @@ namespace Composition110110
             new Rgba32(230, 250, 0),
         };
 
-        public Composition(Image<Rgba32> image)
+        public Composition(Image<Rgba32> image, int seed)
         {
             this.image = image;
+            this.seed = seed;
+
+            if (seed == 0)
+                this.r = new Random();
+            else
+                this.r = new Random(seed);
         }
 
         internal static void ProcessRandomFile(string directoryPath, string searchPattern)
@@ -33,15 +43,14 @@ namespace Composition110110
             var files = Directory.EnumerateFiles(directoryPath, searchPattern).ToList();
             Directory.CreateDirectory(Path.Combine(directoryPath, "out"));
 
-            for (int i = 0; i < 250; i++)
+            for (int i = 0; i < 5; i++)
             {
                 Console.WriteLine($"Composition {i}");
-                var file = files[r.Next(0, files.Count)];
+                var file = files[globalRandom.Next(0, files.Count)];
                 var image = Image.Load(file);
-                var composition = new Composition(image);
-                //composition.MakeBlackAndWhite(); // TODO: just get nice black and white images
+                var composition = new Composition(image, i);
                 composition.Crop(400);
-                composition.PaintMany(6);
+                composition.PaintMany();
                 composition.Save(Path.Combine(directoryPath, "out", $"{i}.png"));
             }
         }
@@ -55,10 +64,15 @@ namespace Composition110110
                 height: dimension)));
         }
 
-        private void PaintMany(int amount)
+        private void PaintMany(int amount = 0)
         {
+            // We want to use the random generator even though we won't use its output, so that its usage is deterministic.
+            var generatedAmount = r.Next(6, 12);
+            if (amount == 0)
+                amount = generatedAmount;
+
             for (int i = 0; i < amount; i++)
-                Paint(i % paintColors.Length);
+                Paint( (i + r.Next(paintColors.Length)) % paintColors.Length );
         }
 
         private void Paint(int colorIndex)
@@ -111,6 +125,7 @@ namespace Composition110110
 
         private void Save(string path)
         {
+            image.MetaData.Properties.Add(new SixLabors.ImageSharp.MetaData.ImageProperty("composition", seed.ToString()));
             image.SaveAsPng(new FileStream(path, FileMode.Create));
         }
     }
