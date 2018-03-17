@@ -12,7 +12,6 @@ Maps are [© Open Street Map](https://www.openstreetmap.org/) and [© Mapbox](ht
 ## To do
 * Apply colors based on land use _by Bianca_
 * More variety
-* Preserve information to programmatically generate the same map again
 * Add required copyright information to finished pieces
 
 ## Showcase
