@@ -13,7 +13,7 @@ namespace Composition110110
 {
     internal class Composition
     {
-        static Random globalRandom = new Random();
+        static Random globalRandom = new Random(0);
         
         private Image<Rgba32> image;
         private int seed;
@@ -80,7 +80,7 @@ namespace Composition110110
             var x = r.Next(0, this.image.Width);
             var y = r.Next(0, this.image.Height);
             var pixel = this.image[x, y];
-            if (pixel.B + pixel.G + pixel.R > 600)
+            if (pixel.B + pixel.G + pixel.R > 480)
             {
                 // it's more or less white. go with this point
                 floodFill(x, y, paintColors[colorIndex]);
@@ -96,16 +96,14 @@ namespace Composition110110
         private void floodFill(int x, int y, Rgba32 color)
         {
             toFill = new Stack<Point>();
-            int pixelsPainted = 0;
             toFill.Push(new Point(x, y));
             do
             {
                 var location = toFill.Pop();
                 var pixel = this.image[location.X, location.Y];
-                if (pixel.B + pixel.G + pixel.R > 600)
+                if (pixel.PartiallyBrighterThan(color))
                 {
-                    pixelsPainted++;
-                    this.image[location.X, location.Y] = color;
+                    this.image[location.X, location.Y] = pixel.Darken(color);
                     if (location.X > 0 && location.X < image.Width - 1 && location.Y > 0 && location.Y < image.Height - 1)
                     {
                         toFill.Push(new Point(location.X + 1, location.Y));
@@ -115,7 +113,6 @@ namespace Composition110110
                     }
                 }
             } while (toFill.Count > 0);
-            System.Diagnostics.Debug.WriteLine($"Painted {pixelsPainted} pixels");
         }
 
         private void MakeBlackAndWhite()
